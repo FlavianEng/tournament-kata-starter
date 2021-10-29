@@ -1,4 +1,4 @@
-import { TournamentToAdd } from '../app/api-model';
+import { Participant, TournamentToAdd } from '../app/api-model';
 import { INestApplication } from '@nestjs/common';
 import { startApp } from './test.utils';
 import * as request from 'supertest';
@@ -8,38 +8,64 @@ const exampleTournament = {
   name: 'Unreal',
 } as TournamentToAdd;
 
-let unrealTournamentId = null;
+const exampleParticipant = {
+  name: 'Sponge Bob',
+  elo: 11,
+} as Participant;
 
 describe('/tournament endpoint', () => {
   let app: INestApplication;
 
+  // Functions
+  async function createTournament(tournament, statusCodeExpected) {
+    const { body } = await request(app.getHttpServer())
+      .post('/api/tournaments')
+      .send(tournament)
+      .expect(statusCodeExpected);
+
+    return body;
+  }
+
+  async function addParticipantToTournament(
+    tournamentId,
+    participant,
+    statusCodeExpected
+  ) {
+    const { body } = await request(app.getHttpServer())
+      .post(`/api/tournaments/${tournamentId}/participants`)
+      .send(participant)
+      .expect(statusCodeExpected);
+
+    return body;
+  }
+
+  async function getTournament(tournamentId, statusCodeExpected) {
+    const { body } = await request(app.getHttpServer())
+      .get(`/api/tournaments/${tournamentId}`)
+      .expect(statusCodeExpected);
+
+    return body;
+  }
+
+  // Tests
   beforeAll(async () => {
     app = await startApp();
   });
 
   describe('[POST] when creating a tournament', () => {
     it('should return the correct id', async () => {
-      const { body } = await request(app.getHttpServer())
-        .post('/api/tournaments')
-        .send(exampleTournament)
-        .expect(201);
+      const tournament = await createTournament(exampleTournament, 201);
 
-      expect(body.id).not.toBeUndefined();
+      expect(tournament.id).not.toBeUndefined();
     });
 
     it('should have stored the tournament', async () => {
-      const { body } = await request(app.getHttpServer())
-        .post('/api/tournaments')
-        .send(exampleTournament)
-        .expect(201);
-
+      const body = await createTournament(exampleTournament, 201);
       const get = await request(app.getHttpServer())
         .get(`/api/tournaments/${body.id}`)
         .expect(200);
 
       expect(get.body.name).toEqual(exampleTournament.name);
-
-      unrealTournamentId = get.body.id;
     });
 
     it('should fail because tournament name is missing', async () => {
@@ -47,10 +73,7 @@ describe('/tournament endpoint', () => {
         name: '',
       } as TournamentToAdd;
 
-      const { body } = await request(app.getHttpServer())
-        .post('/api/tournaments')
-        .send(emptyTournament)
-        .expect(400);
+      const body = await createTournament(emptyTournament, 400);
 
       expect(body.message).toEqual('Name is missing');
     });
@@ -59,20 +82,74 @@ describe('/tournament endpoint', () => {
   describe('[GET] when getting a tournament', () => {
     it('should fail because tournament id is missing', async () => {
       const randomId = uuidv4();
-
-      const { body } = await request(app.getHttpServer())
-        .get(`/api/tournaments/${randomId}`)
-        .expect(404);
+      const body = await getTournament(randomId, 404);
 
       expect(body.message).toEqual("This tournament doesn't exist");
     });
 
     it('should get a tournament', async () => {
-      const { body } = await request(app.getHttpServer())
-        .get(`/api/tournaments/${unrealTournamentId}`)
-        .expect(200);
+      const tournament = await createTournament(exampleTournament, 201);
+      const body = await getTournament(tournament.id, 200);
 
       expect(body.name).toEqual('Unreal');
+    });
+  });
+
+  describe('[POST] when creating a participant', () => {
+    it('should fail because participant name is missing', async () => {
+      const emptyParticipant = {
+        name: '',
+        elo: 11,
+      } as Participant;
+
+      const tournament = await createTournament(exampleTournament, 201);
+
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
+
+    it('should fail because participant elo is negative', async () => {
+      const emptyParticipant = {
+        name: 'Sponge Bob',
+        elo: -5,
+      } as Participant;
+
+      const tournament = await createTournament(exampleTournament, 201);
+
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
+
+    it('should fail because participant elo is not an integer', async () => {
+      const emptyParticipant = {
+        name: 'Sponge Bob',
+        elo: 5.11,
+      } as Participant;
+
+      const tournament = await createTournament(exampleTournament, 201);
+
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
+
+    it('should add a participant to unrealTournament', async () => {
+      const tournament = await createTournament(exampleTournament, 201);
+      const body = await addParticipantToTournament(
+        tournament.id,
+        exampleParticipant,
+        201
+      );
+
+      expect(body.id).toBeTruthy();
+    });
+
+    it("should fail because the tournament doesn't exist", async () => {
+      const tournamentId = uuidv4();
+
+      const body = await addParticipantToTournament(
+        tournamentId,
+        exampleParticipant,
+        404
+      );
+
+      expect(body.id).toBeUndefined();
     });
   });
 });
