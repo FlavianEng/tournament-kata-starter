@@ -1,13 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
 import { Participant, TournamentPhase } from '../api-model';
+import * as mongoose from 'mongoose';
 
 export type TournamentDocument = Tournament & Document;
 
 @Schema()
 export class Tournament {
   @Prop()
-  id: ObjectId;
+  id: mongoose.Types.ObjectId;
 
   @Prop()
   name: string;

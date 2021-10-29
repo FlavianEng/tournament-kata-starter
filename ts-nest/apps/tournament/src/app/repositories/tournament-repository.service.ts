@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
 import { CreateTournamentDto } from '../api-model';
-import { ObjectId } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 // import { Tournament, Participant } from '../api-model';
 
@@ -26,7 +26,7 @@ export class TournamentRepositoryService {
     return this.tournamentModel.find().exec();
   }
 
-  async findOne(tournamentId: ObjectId): Promise<Tournament> {
+  async findOne(tournamentId: mongoose.Types.ObjectId): Promise<Tournament> {
     return this.tournamentModel.findById(tournamentId).exec();
   }
 

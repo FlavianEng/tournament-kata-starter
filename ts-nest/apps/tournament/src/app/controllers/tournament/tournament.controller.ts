@@ -10,7 +10,7 @@ import {
 import { TournamentToAdd } from '../../api-model';
 import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
 import { Tournament } from '../../schemas/tournament.schema';
-import { ObjectId } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 @Controller('tournaments')
 export class TournamentController {
@@ -19,7 +19,7 @@ export class TournamentController {
   @Post()
   public async createTournament(
     @Body() tournamentToAdd: TournamentToAdd
-  ): Promise<{ id: ObjectId }> {
+  ): Promise<{ id: mongoose.Types.ObjectId }> {
     if (tournamentToAdd.name.length < 1) {
       throw new HttpException('Name is missing', HttpStatus.BAD_REQUEST);
     }
@@ -32,13 +32,15 @@ export class TournamentController {
 
     // FIXME Don't return _id
     const res = await this.tournamentRepository.createTournament(tournament);
-    console.log('🚀   res', res, res._id); // FIXME Connait pas puisque abs du schéma
+    // console.log('🚀   res', res, res._id); // FIXME Connait pas puisque abs du schéma
 
     return { id: res.id };
   }
 
   @Get(':id')
-  public getTournament(@Param('id') id: ObjectId): Promise<Tournament> {
+  public getTournament(
+    @Param('id') id: mongoose.Types.ObjectId
+  ): Promise<Tournament> {
     const tournamentId = this.tournamentRepository.findOne(id);
 
     if (tournamentId) {
