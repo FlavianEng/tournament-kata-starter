@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { PingController } from './controllers/ping/ping.controller';
-import { TournamentController } from './controllers/tournament/tournament.controller';
-import { ParticipantController } from './controllers/tournament/participant.controller';
-import { TournamentRepositoryService } from './repositories/tournament-repository.service';
+import { TournamentsModule } from './modules/tournaments.module';
 
 @Module({
-  imports: [],
-  controllers: [PingController, TournamentController, ParticipantController],
-  providers: [TournamentRepositoryService],
+  imports: [MongooseModule.forRoot(process.env.MONGODB_URI), TournamentsModule],
+  controllers: [PingController],
 })
 export class AppModule {}

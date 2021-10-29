@@ -1,42 +1,46 @@
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
-  Param,
   Post,
+  Param,
+  Get,
 } from '@nestjs/common';
-import { Tournament, TournamentToAdd } from '../../api-model';
-import { v4 as uuidv4 } from 'uuid';
+import { TournamentToAdd } from '../../api-model';
 import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
+import { Tournament } from '../../schemas/tournament.schema';
+import { ObjectId } from 'mongoose';
 
 @Controller('tournaments')
 export class TournamentController {
   constructor(private tournamentRepository: TournamentRepositoryService) {}
 
   @Post()
-  public createTournament(@Body() tournamentToAdd: TournamentToAdd): {
-    id: string;
-  } {
+  public async createTournament(
+    @Body() tournamentToAdd: TournamentToAdd
+  ): Promise<{ id: ObjectId }> {
     if (tournamentToAdd.name.length < 1) {
       throw new HttpException('Name is missing', HttpStatus.BAD_REQUEST);
     }
 
     const tournament = {
-      id: uuidv4(),
       name: tournamentToAdd.name,
       phases: [],
       participants: [],
     };
-    this.tournamentRepository.saveTournament(tournament);
 
-    return { id: tournament.id };
+    // FIXME Don't return _id
+    const res = await this.tournamentRepository.createTournament(tournament);
+    console.log('🚀   res', res, res._id); // FIXME Connait pas puisque abs du schéma
+
+    return { id: res.id };
   }
 
   @Get(':id')
-  public getTournament(@Param('id') id: string): Tournament {
-    const tournamentId = this.tournamentRepository.getTournament(id);
+  public getTournament(@Param('id') id: ObjectId): Promise<Tournament> {
+    const tournamentId = this.tournamentRepository.findOne(id);
+
     if (tournamentId) {
       return tournamentId;
     }

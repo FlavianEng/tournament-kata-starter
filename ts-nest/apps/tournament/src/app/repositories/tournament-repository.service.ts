@@ -1,28 +1,53 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { Tournament, Participant } from '../api-model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
+import { CreateTournamentDto } from '../api-model';
+import { ObjectId } from 'mongoose';
+
+// import { Tournament, Participant } from '../api-model';
 
 @Injectable()
 export class TournamentRepositoryService {
-  private tournaments = new Map<string, Tournament>();
+  constructor(
+    @InjectModel(Tournament.name)
+    private tournamentModel: Model<TournamentDocument>
+  ) {}
 
-  public saveTournament(tournament: Tournament): void {
-    this.tournaments.set(tournament.id, tournament);
+  async createTournament(
+    createTournamentDto: CreateTournamentDto
+  ): Promise<Tournament> {
+    const createdTournament = new this.tournamentModel(createTournamentDto);
+    console.log('🚀   createdTournament', createdTournament);
+    return createdTournament.save();
   }
 
-  public getTournament(tournamentId: string): Tournament {
-    return this.tournaments.get(tournamentId);
+  async findAll(): Promise<Tournament[]> {
+    return this.tournamentModel.find().exec();
   }
+
+  async findOne(tournamentId: ObjectId): Promise<Tournament> {
+    return this.tournamentModel.findById(tournamentId).exec();
+  }
+
+  // public saveTournament(tournament: Tournament): void {
+  //   this.tournaments.set(tournament.id, tournament);
+  // }
+
+  // public getTournament(tournamentId: string): Tournament {
+  //   return this.tournaments.get(tournamentId);
+  // }
 }
 
-@Injectable()
-export class ParticipantRepositoryService {
-  private participants = new Map<string, Participant>();
+// @Injectable()
+// export class ParticipantRepositoryService {
+//   private participants = new Map<string, Participant>();
 
-  public saveParticipant(participant: Participant): void {
-    this.participants.set(participant.id, participant);
-  }
+//   public saveParticipant(participant: Participant): void {
+//     this.participants.set(participant.id, participant);
+//   }
 
-  public getParticipant(participantId: string): Participant {
-    return this.participants.get(participantId);
-  }
-}
+//   public getParticipant(participantId: string): Participant {
+//     return this.participants.get(participantId);
+//   }
+// }

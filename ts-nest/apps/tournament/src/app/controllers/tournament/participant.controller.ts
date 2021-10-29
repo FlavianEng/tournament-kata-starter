@@ -43,18 +43,18 @@ export class ParticipantController {
       elo: participantToAdd.elo,
     };
 
-    const tournament = this.tournamentRepository.getTournament(id);
+    // const tournament = this.tournamentRepository.findOne(id);
 
-    if (!tournament) {
-      throw new HttpException(
-        "This tournament doesn't exist",
-        HttpStatus.NOT_FOUND
-      );
-    }
+    // if (!tournament) {
+    //   throw new HttpException(
+    //     "This tournament doesn't exist",
+    //     HttpStatus.NOT_FOUND
+    //   );
+    // }
 
-    tournament.participants.push(participant);
+    // tournament.participants.push(participant);
 
-    this.tournamentRepository.saveTournament(tournament);
+    // this.tournamentRepository.createTournament(tournament);
 
     return participant;
   }
