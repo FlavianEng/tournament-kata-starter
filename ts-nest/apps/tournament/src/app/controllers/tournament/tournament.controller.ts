@@ -6,6 +6,7 @@ import {
   Post,
   Param,
   Get,
+  Delete,
 } from '@nestjs/common';
 import { TournamentToAdd } from '../../api-model';
 import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
@@ -49,5 +50,11 @@ export class TournamentController {
       "This tournament doesn't exist",
       HttpStatus.NOT_FOUND
     );
+  }
+
+  @Delete()
+  public async removeAllTournaments(): Promise<void> {
+    const { deletedCount } = await this.tournamentRepository.deleteAll();
+    console.info(deletedCount, 'élément.s supprimé.s');
   }
 }

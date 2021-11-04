@@ -4,8 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
 import { CreateTournamentDto } from '../api-model';
 import * as mongoose from 'mongoose';
-
-// import { Tournament, Participant } from '../api-model';
+import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class TournamentRepositoryService {
@@ -29,5 +28,9 @@ export class TournamentRepositoryService {
 
   async findOne(tournamentId: mongoose.Types.ObjectId): Promise<Tournament> {
     return this.tournamentModel.findById(tournamentId).exec();
+  }
+
+  async deleteAll(): Promise<DeleteResult> {
+    return this.tournamentModel.deleteMany({});
   }
 }

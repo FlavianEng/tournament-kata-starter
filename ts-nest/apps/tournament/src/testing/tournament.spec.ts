@@ -52,6 +52,10 @@ describe('/tournament endpoint', () => {
     app = await startApp();
   });
 
+  afterAll(async () => {
+    await request(app.getHttpServer()).delete(`/api/tournaments`);
+  });
+
   describe('[POST] when creating a tournament', () => {
     it('should return the correct id', async () => {
       const tournament = await createTournament(exampleTournament, 201);
