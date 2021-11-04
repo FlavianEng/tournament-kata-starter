@@ -1,17 +1,17 @@
-import { TournamentToAdd } from '../app/api-model';
+import { TournamentToAdd, Participant } from '../app/api-model';
 import { INestApplication } from '@nestjs/common';
 import { startApp } from './test.utils';
 import * as request from 'supertest';
-// import { v4 as uuidv4 } from 'uuid';
+import * as mongoose from 'mongoose';
 
 const exampleTournament = {
   name: 'Unreal',
 } as TournamentToAdd;
 
-// const exampleParticipant = {
-//   name: 'Sponge Bob',
-//   elo: 11,
-// } as Participant;
+const exampleParticipant = {
+  name: 'Sponge Bob',
+  elo: 11,
+} as Participant;
 
 describe('/tournament endpoint', () => {
   let app: INestApplication;
@@ -26,26 +26,26 @@ describe('/tournament endpoint', () => {
     return body;
   }
 
-  // async function addParticipantToTournament(
-  //   tournamentId,
-  //   participant,
-  //   statusCodeExpected
-  // ) {
-  //   const { body } = await request(app.getHttpServer())
-  //     .post(`/api/tournaments/${tournamentId}/participants`)
-  //     .send(participant)
-  //     .expect(statusCodeExpected);
+  async function addParticipantToTournament(
+    tournamentId,
+    participant,
+    statusCodeExpected
+  ) {
+    const { body } = await request(app.getHttpServer())
+      .post(`/api/tournaments/${tournamentId}/participants`)
+      .send(participant)
+      .expect(statusCodeExpected);
 
-  //   return body;
-  // }
+    return body;
+  }
 
-  // async function getTournament(tournamentId, statusCodeExpected) {
-  //   const { body } = await request(app.getHttpServer())
-  //     .get(`/api/tournaments/${tournamentId}`)
-  //     .expect(statusCodeExpected);
+  async function getTournament(tournamentId, statusCodeExpected) {
+    const { body } = await request(app.getHttpServer())
+      .get(`/api/tournaments/${tournamentId}`)
+      .expect(statusCodeExpected);
 
-  //   return body;
-  // }
+    return body;
+  }
 
   // Tests
   beforeAll(async () => {
@@ -79,77 +79,80 @@ describe('/tournament endpoint', () => {
     });
   });
 
-  // describe('[GET] when getting a tournament', () => {
-  //   it('should fail because tournament id is missing', async () => {
-  //     const randomId = uuidv4();
-  //     const body = await getTournament(randomId, 404);
+  describe('[GET] when getting a tournament', () => {
+    it('should fail because tournament id is missing', async () => {
+      const objectId = new mongoose.Types.ObjectId();
+      const randomId = objectId.toString();
 
-  //     expect(body.message).toEqual("This tournament doesn't exist");
-  //   });
+      const body = await getTournament(randomId, 404);
 
-  //   it('should get a tournament', async () => {
-  //     const tournament = await createTournament(exampleTournament, 201);
-  //     const body = await getTournament(tournament.id, 200);
+      expect(body.message).toEqual("This tournament doesn't exist");
+    });
 
-  //     expect(body.name).toEqual('Unreal');
-  //   });
-  // });
+    it('should get a tournament', async () => {
+      const tournament = await createTournament(exampleTournament, 201);
+      const body = await getTournament(tournament.id, 200);
 
-  // describe('[POST] when creating a participant', () => {
-  //   it('should fail because participant name is missing', async () => {
-  //     const emptyParticipant = {
-  //       name: '',
-  //       elo: 11,
-  //     } as Participant;
+      expect(body.name).toEqual('Unreal');
+    });
+  });
 
-  //     const tournament = await createTournament(exampleTournament, 201);
+  describe('[POST] when creating a participant', () => {
+    it('should fail because participant name is missing', async () => {
+      const emptyParticipant = {
+        name: '',
+        elo: 11,
+      } as Participant;
 
-  //     await addParticipantToTournament(tournament.id, emptyParticipant, 400);
-  //   });
+      const tournament = await createTournament(exampleTournament, 201);
 
-  //   it('should fail because participant elo is negative', async () => {
-  //     const emptyParticipant = {
-  //       name: 'Sponge Bob',
-  //       elo: -5,
-  //     } as Participant;
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
 
-  //     const tournament = await createTournament(exampleTournament, 201);
+    it('should fail because participant elo is negative', async () => {
+      const emptyParticipant = {
+        name: 'Sponge Bob',
+        elo: -5,
+      } as Participant;
 
-  //     await addParticipantToTournament(tournament.id, emptyParticipant, 400);
-  //   });
+      const tournament = await createTournament(exampleTournament, 201);
 
-  //   it('should fail because participant elo is not an integer', async () => {
-  //     const emptyParticipant = {
-  //       name: 'Sponge Bob',
-  //       elo: 5.11,
-  //     } as Participant;
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
 
-  //     const tournament = await createTournament(exampleTournament, 201);
+    it('should fail because participant elo is not an integer', async () => {
+      const emptyParticipant = {
+        name: 'Sponge Bob',
+        elo: 5.11,
+      } as Participant;
 
-  //     await addParticipantToTournament(tournament.id, emptyParticipant, 400);
-  //   });
+      const tournament = await createTournament(exampleTournament, 201);
 
-  //   it('should add a participant to unrealTournament', async () => {
-  //     const tournament = await createTournament(exampleTournament, 201);
-  //     const body = await addParticipantToTournament(
-  //       tournament.id,
-  //       exampleParticipant,
-  //       201
-  //     );
+      await addParticipantToTournament(tournament.id, emptyParticipant, 400);
+    });
 
-  //     expect(body.id).toBeTruthy();
-  //   });
+    it('should add a participant to unrealTournament', async () => {
+      const tournament = await createTournament(exampleTournament, 201);
+      const body = await addParticipantToTournament(
+        tournament.id,
+        exampleParticipant,
+        201
+      );
 
-  //   it("should fail because the tournament doesn't exist", async () => {
-  //     const tournamentId = uuidv4();
+      expect(body.id).toBeTruthy();
+    });
 
-  //     const body = await addParticipantToTournament(
-  //       tournamentId,
-  //       exampleParticipant,
-  //       404
-  //     );
+    it("should fail because the tournament doesn't exist", async () => {
+      const objectId = new mongoose.Types.ObjectId();
+      const tournamentId = objectId.toString();
 
-  //     expect(body.id).toBeUndefined();
-  //   });
-  // });
+      const body = await addParticipantToTournament(
+        tournamentId,
+        exampleParticipant,
+        404
+      );
+
+      expect(body.id).toBeUndefined();
+    });
+  });
 });

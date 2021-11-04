@@ -19,7 +19,7 @@ export class TournamentController {
   @Post()
   public async createTournament(
     @Body() tournamentToAdd: TournamentToAdd
-  ): Promise<{ id: mongoose.Types.ObjectId }> {
+  ): Promise<{ id: string }> {
     if (tournamentToAdd.name.length < 1) {
       throw new HttpException('Name is missing', HttpStatus.BAD_REQUEST);
     }
@@ -30,18 +30,16 @@ export class TournamentController {
       participants: [],
     };
 
-    // FIXME Don't return _id
     const res = await this.tournamentRepository.createTournament(tournament);
-    // console.log('🚀   res', res, res._id); // FIXME Connait pas puisque abs du schéma
 
     return { id: res.id };
   }
 
   @Get(':id')
-  public getTournament(
-    @Param('id') id: mongoose.Types.ObjectId
-  ): Promise<Tournament> {
-    const tournamentId = this.tournamentRepository.findOne(id);
+  public async getTournament(@Param('id') id: string): Promise<Tournament> {
+    const tournamentId = await this.tournamentRepository.findOne(
+      new mongoose.Types.ObjectId(id)
+    );
 
     if (tournamentId) {
       return tournamentId;

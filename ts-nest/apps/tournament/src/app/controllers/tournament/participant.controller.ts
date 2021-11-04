@@ -9,16 +9,17 @@ import {
 import { Participant } from '../../api-model';
 import { v4 as uuidv4 } from 'uuid';
 import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
+import * as mongoose from 'mongoose';
 
 @Controller('tournaments/:id/participants')
 export class ParticipantController {
   constructor(private tournamentRepository: TournamentRepositoryService) {}
 
   @Post()
-  public createParticipant(
+  public async createParticipant(
     @Param('id') id: string,
     @Body() participantToAdd: Participant
-  ): Participant {
+  ): Promise<Participant> {
     if (participantToAdd.name.length < 1) {
       throw new HttpException('Name is missing', HttpStatus.BAD_REQUEST);
     }
@@ -43,18 +44,20 @@ export class ParticipantController {
       elo: participantToAdd.elo,
     };
 
-    // const tournament = this.tournamentRepository.findOne(id);
+    const tournament = await this.tournamentRepository.findOne(
+      new mongoose.Types.ObjectId(id)
+    );
 
-    // if (!tournament) {
-    //   throw new HttpException(
-    //     "This tournament doesn't exist",
-    //     HttpStatus.NOT_FOUND
-    //   );
-    // }
+    if (!tournament) {
+      throw new HttpException(
+        "This tournament doesn't exist",
+        HttpStatus.NOT_FOUND
+      );
+    }
 
-    // tournament.participants.push(participant);
+    tournament.participants.push(participant);
 
-    // this.tournamentRepository.createTournament(tournament);
+    this.tournamentRepository.createTournament(tournament);
 
     return participant;
   }

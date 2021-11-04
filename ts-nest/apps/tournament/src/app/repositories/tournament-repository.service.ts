@@ -18,7 +18,8 @@ export class TournamentRepositoryService {
     createTournamentDto: CreateTournamentDto
   ): Promise<Tournament> {
     const createdTournament = new this.tournamentModel(createTournamentDto);
-    console.log('🚀   createdTournament', createdTournament);
+    createdTournament.id = createdTournament._id;
+
     return createdTournament.save();
   }
 
@@ -29,25 +30,4 @@ export class TournamentRepositoryService {
   async findOne(tournamentId: mongoose.Types.ObjectId): Promise<Tournament> {
     return this.tournamentModel.findById(tournamentId).exec();
   }
-
-  // public saveTournament(tournament: Tournament): void {
-  //   this.tournaments.set(tournament.id, tournament);
-  // }
-
-  // public getTournament(tournamentId: string): Tournament {
-  //   return this.tournaments.get(tournamentId);
-  // }
 }
-
-// @Injectable()
-// export class ParticipantRepositoryService {
-//   private participants = new Map<string, Participant>();
-
-//   public saveParticipant(participant: Participant): void {
-//     this.participants.set(participant.id, participant);
-//   }
-
-//   public getParticipant(participantId: string): Participant {
-//     return this.participants.get(participantId);
-//   }
-// }
