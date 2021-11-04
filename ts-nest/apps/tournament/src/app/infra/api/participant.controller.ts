@@ -6,9 +6,9 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { Participant } from '../../api-model';
+import { Participant } from '../../domain/model/api-model';
 import { v4 as uuidv4 } from 'uuid';
-import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
+import { TournamentRepositoryService } from '../storage/tournament.storage';
 import * as mongoose from 'mongoose';
 
 @Controller('tournaments/:id/participants')

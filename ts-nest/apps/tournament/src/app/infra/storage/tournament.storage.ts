@@ -1,8 +1,8 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
-import { CreateTournamentDto } from '../api-model';
+import { Tournament, TournamentDocument } from '../storage/dao/tournament.dao';
+import { CreateTournamentDto } from '../../domain/model/api-model';
 import * as mongoose from 'mongoose';
 import { DeleteResult } from 'mongodb';
 

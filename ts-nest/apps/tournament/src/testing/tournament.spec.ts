@@ -1,4 +1,4 @@
-import { TournamentToAdd, Participant } from '../app/api-model';
+import { TournamentToAdd, Participant } from '../app/domain/model/api-model';
 import { INestApplication } from '@nestjs/common';
 import { startApp } from './test.utils';
 import * as request from 'supertest';

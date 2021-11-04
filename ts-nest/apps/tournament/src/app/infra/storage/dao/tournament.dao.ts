@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Participant, TournamentPhase } from '../api-model';
+import { Participant, TournamentPhase } from '../../../domain/model/api-model';
 
 export type TournamentDocument = Tournament & Document;
 

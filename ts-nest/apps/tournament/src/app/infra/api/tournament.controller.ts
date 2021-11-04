@@ -8,9 +8,9 @@ import {
   Get,
   Delete,
 } from '@nestjs/common';
-import { TournamentToAdd } from '../../api-model';
-import { TournamentRepositoryService } from '../../repositories/tournament-repository.service';
-import { Tournament } from '../../schemas/tournament.schema';
+import { TournamentToAdd } from '../../domain/model/api-model';
+import { TournamentRepositoryService } from '../storage/tournament.storage';
+import { Tournament } from '../storage/dao/tournament.dao';
 import * as mongoose from 'mongoose';
 
 @Controller('tournaments')

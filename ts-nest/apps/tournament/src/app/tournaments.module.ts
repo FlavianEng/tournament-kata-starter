@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ParticipantController } from '../controllers/tournament/participant.controller';
-import { TournamentController } from '../controllers/tournament/tournament.controller';
-import { TournamentRepositoryService } from '../repositories/tournament-repository.service';
-import { Tournament, TournamentSchema } from '../schemas/tournament.schema';
+import { ParticipantController } from './infra/api/participant.controller';
+import { TournamentController } from './infra/api/tournament.controller';
+import { TournamentRepositoryService } from './infra/storage/tournament.storage';
+import {
+  Tournament,
+  TournamentSchema,
+} from './infra/storage/dao/tournament.dao';
 
 @Module({
   imports: [
