@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { Participant } from '../../domain/model/api-model';
 import { v4 as uuidv4 } from 'uuid';
-import { TournamentRepositoryService } from '../storage/tournament.storage';
+import { TournamentStorage } from '../storage/tournament.storage';
 import * as mongoose from 'mongoose';
 
 @Controller('tournaments/:id/participants')
 export class ParticipantController {
-  constructor(private tournamentRepository: TournamentRepositoryService) {}
+  constructor(private tournamentStorage: TournamentStorage) {}
 
   @Post()
   public async createParticipant(
@@ -44,7 +44,7 @@ export class ParticipantController {
       elo: participantToAdd.elo,
     };
 
-    const tournament = await this.tournamentRepository.findOne(
+    const tournament = await this.tournamentStorage.findOne(
       new mongoose.Types.ObjectId(id)
     );
 
@@ -57,7 +57,7 @@ export class ParticipantController {
 
     tournament.participants.push(participant);
 
-    this.tournamentRepository.createTournament(tournament);
+    this.tournamentStorage.createTournament(tournament);
 
     return participant;
   }

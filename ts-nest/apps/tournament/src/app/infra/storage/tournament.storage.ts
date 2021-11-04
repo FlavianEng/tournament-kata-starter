@@ -7,7 +7,7 @@ import * as mongoose from 'mongoose';
 import { DeleteResult } from 'mongodb';
 
 @Injectable()
-export class TournamentRepositoryService {
+export class TournamentStorage {
   constructor(
     @InjectModel(Tournament.name)
     private tournamentModel: Model<TournamentDocument>

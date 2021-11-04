@@ -9,13 +9,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { TournamentToAdd } from '../../domain/model/api-model';
-import { TournamentRepositoryService } from '../storage/tournament.storage';
+import { TournamentStorage } from '../storage/tournament.storage';
 import { Tournament } from '../storage/dao/tournament.dao';
 import * as mongoose from 'mongoose';
 
 @Controller('tournaments')
 export class TournamentController {
-  constructor(private tournamentRepository: TournamentRepositoryService) {}
+  constructor(private tournamentStorage: TournamentStorage) {}
 
   @Post()
   public async createTournament(
@@ -31,14 +31,14 @@ export class TournamentController {
       participants: [],
     };
 
-    const res = await this.tournamentRepository.createTournament(tournament);
+    const res = await this.tournamentStorage.createTournament(tournament);
 
     return { id: res.id };
   }
 
   @Get(':id')
   public async getTournament(@Param('id') id: string): Promise<Tournament> {
-    const tournamentId = await this.tournamentRepository.findOne(
+    const tournamentId = await this.tournamentStorage.findOne(
       new mongoose.Types.ObjectId(id)
     );
 
@@ -54,7 +54,7 @@ export class TournamentController {
 
   @Delete()
   public async removeAllTournaments(): Promise<void> {
-    const { deletedCount } = await this.tournamentRepository.deleteAll();
+    const { deletedCount } = await this.tournamentStorage.deleteAll();
     console.info(deletedCount, 'élément.s supprimé.s');
   }
 }
