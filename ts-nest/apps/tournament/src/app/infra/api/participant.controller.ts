@@ -44,7 +44,7 @@ export class ParticipantController {
       elo: participantToAdd.elo,
     };
 
-    const tournament = await this.tournamentStorage.findOne(
+    const tournament = await this.tournamentStorage.findById(
       new mongoose.Types.ObjectId(id)
     );
 

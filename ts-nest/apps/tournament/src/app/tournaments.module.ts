@@ -7,6 +7,7 @@ import {
   Tournament,
   TournamentSchema,
 } from './infra/storage/dao/tournament.dao';
+import { TournamentService } from './domain/service/tournament.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import {
     ]),
   ],
   controllers: [TournamentController, ParticipantController],
-  providers: [TournamentStorage],
+  providers: [TournamentStorage, TournamentService],
 })
 export class TournamentsModule {}

@@ -26,8 +26,12 @@ export class TournamentStorage {
     return this.tournamentModel.find().exec();
   }
 
-  async findOne(tournamentId: mongoose.Types.ObjectId): Promise<Tournament> {
+  async findById(tournamentId: mongoose.Types.ObjectId): Promise<Tournament> {
     return this.tournamentModel.findById(tournamentId).exec();
+  }
+
+  async findByName(tournamentName: string): Promise<Tournament> {
+    return this.tournamentModel.findOne({ name: tournamentName }).exec();
   }
 
   async deleteAll(): Promise<DeleteResult> {
